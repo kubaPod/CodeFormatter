@@ -1,5 +1,9 @@
 (* ::Package:: *)
 
+(* ::Section::Closed:: *)
+(*metadata*)
+
+
 (* Mathematica Package *)
 
 (* :Title: CodeFormatter   *) 
@@ -22,6 +26,10 @@
 
 (*  :Mathematica version:  8.0  *)
 
+
+
+(* ::Section::Closed:: *)
+(*export*)
 
 
 BeginPackage["CodeFormatter`"]
@@ -62,8 +70,17 @@ works, it may produce somewhat better result
 CodeFormatted::usage = "CodeFormatted[code]  prints a cell with the formatted code. This function 
 has an attribute HoldAll";
 
+
+(* ::Section:: *)
+(*implementation*)
+
+
 Begin["`Private`"]
 (* Implementation of the package *)
+
+
+(* ::Subsection::Closed:: *)
+(*misc*)
 
 
 $supportedBoxes = {StyleBox, TagBox, FractionBox,ItemBox (*,DynamicModuleBox*)};
@@ -131,6 +148,12 @@ ClearAll[strsymQ];
 strsymQ[s_String] :=
     StringMatchQ[ s, (LetterCharacter | "$") ~~ ((WordCharacter | "$" | "`") ...)];
  
+
+
+(* ::Subsection::Closed:: *)
+(*preformat*)
+
+
 ClearAll[preformat];
 (* SetAttributes[preformat,HoldAll]; *)
 
@@ -261,6 +284,10 @@ preformat[expr_] :=
 
 
 
+(* ::Subsection::Closed:: *)
+(*processPreformatted*)
+
+
 ClearAll[processPreformatted];
 processPreformatted[GeneralBlock[blocks__]]/;$combineTopLevelStatements :=
     GeneralBlock[Sequence @@ Map[processPreformatted, {blocks}]];
@@ -273,6 +300,10 @@ processPreformatted[
 processPreformatted[arg_] :=  arg;
 
 
+
+
+(* ::Subsection::Closed:: *)
+(*tabify*)
 
 
 ClearAll[tabify];
@@ -318,6 +349,10 @@ isNextNewline[block : (_?blockQ | TabBlock)[fst_, ___]] :=
 
 isNextNewline[_] := False;
 
+
+
+(* ::Subsection::Closed:: *)
+(*postformat*)
 
 
 ClearAll[postformat];
@@ -535,6 +570,12 @@ needSplitQ[expr_, currentTab_] :=
     maxLen[expr] > $maxLineLength - currentTab;
  
   
+
+
+(* ::Subsection::Closed:: *)
+(*format*)
+
+
 ClearAll[format];
 
 format[expr_] :=
@@ -686,6 +727,10 @@ format[a_?AtomQ, _] := a;
 $tabWidth = 4;
 
 
+(* ::Subsection::Closed:: *)
+(*FullCodeFormat*)
+
+
     
 ClearAll[FullCodeFormat, FullCodeFormatCompact];
 FullCodeFormat[boxes_] :=
@@ -693,6 +738,11 @@ Block[{$tabWidth = $defaultTabWidth},
     postformat@
      tabify@format@processPreformatted@preformat@preprocess@boxes
 ];
+
+
+(* ::Subsection::Closed:: *)
+(*FullCodeFormatCompact*)
+
 
 FullCodeFormatCompact[boxes_] :=
     Block[ {$alignClosingBracket = False,
@@ -704,6 +754,11 @@ FullCodeFormatCompact[boxes_] :=
     ];    
      
 
+
+(* ::Subsection::Closed:: *)
+(*SEFormat*)
+
+
 SEFormat[boxes_,lineWidth_,tabWidth_, overallTab_]:=
 	Block[{$defaultTabWidth = tabWidth, $maxLineLength = lineWidth,$overallTab= overallTab ,
 		$useSpacesForTabs  = True},
@@ -712,6 +767,12 @@ SEFormat[boxes_,lineWidth_,tabWidth_, overallTab_]:=
 	
 	
 	
+
+
+(* ::Subsection::Closed:: *)
+(*Simplified version of MakeBoxes*)
+
+
 (*============================================================================================*)
 (*=========			 Simplified version of MakeBoxes 		==============*)
 (*============================================================================================*)
@@ -804,6 +865,12 @@ CodeFormatterMakeBoxes[args__]:=makeBoxes[args]
 	
 	
 	
+
+
+(* ::Subsection::Closed:: *)
+(* Printing definitions and spelunking*)
+
+
 (*============================================================================================*)
 (*=========		 Printing definitions and spelunking 			==============*)
 (*============================================================================================*)	
@@ -898,6 +965,10 @@ CodeFormatted /: CompoundExpression[prev___,CodeFormatted[last_]]:=
 	
 CodeFormatted[code_]:= codeFormatted[code];
 
+
+
+(* ::Section::Closed:: *)
+(*end*)
 
 
 End[]
